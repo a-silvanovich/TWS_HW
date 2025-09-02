@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+
+lesson 8.py
+lesson 7.py
+lesson 6.py
+lesson 5.py
+lesson 4*.py
+.venv
+main.py
+.TMS_HW
