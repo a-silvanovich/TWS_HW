@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование столика</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .table-info {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .table-info img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+        .table-details h2 {
+            margin: 0 0 10px;
+            color: #2c3e50;
+        }
+        .table-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .reservation-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="date"]:focus,
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+    <h1>Бронирование столика</h1>
+    <div class="table-info">
+        <img src="{% if table.image %}{{ table.image.url }}{% else %}/static/images/default_table.jpg{% endif %}" alt="Стол {{ table.number }}">
+        <div class="table-details">
+            <h2>Стол №{{ table.number }}</h2>
+            <p>Количество мест: {{ table.seats }}</p>
+        </div>
+    </div>
+    <div class="reservation-form">
+        {% if form.errors %}
+            <p class="error">Пожалуйста, исправьте ошибки ниже:</p>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+        <form method="post" action="{% url 'reservation' table.number %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_date">Дата бронирования:</label>
+                <input type="date" id="id_date" name="date" value="{{ form.date.value|date:'Y-m-d'|default_if_none:'' }}" required>
+                {% if form.date.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.date.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_hour_start">Час начала (8-18):</label>
+                <input type="number" id="id_hour_start" name="hour_start" min="8" max="18" value="{{ form.hour_start.value|default_if_none:'' }}" required>
+                {% if form.hour_start.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.hour_start.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_hour_end">Час окончания (8-18):</label>
+                <input type="number" id="id_hour_end" name="hour_end" min="8" max="18" value="{{ form.hour_end.value|default_if_none:'' }}" required>
+                {% if form.hour_end.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.hour_end.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <button type="submit">Забронировать</button>
+        </form>
+    </div>
+</body>
+</html>

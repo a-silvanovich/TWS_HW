@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование столов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .filter-form {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .filter-form label {
+            margin-right: 10px;
+            color: #555;
+        }
+        .filter-form input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 150px;
+        }
+        .filter-form button {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .filter-form button:hover {
+            background-color: #2980b9;
+        }
+        .tables-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .table-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
+        .table-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .table-card h3 {
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+        .table-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .reserve-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .reserve-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+    <h1>Доступные столы для бронирования</h1>
+    <div class="filter-form">
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">Фильтровать</button>
+        <a href="{% url 'tables' %}" class="reset-button">Сбросить</a>
+    </form>
+</div>
+<style>
+    .reset-button {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #ccc;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-left: 10px;
+    }
+    .reset-button:hover {
+        background-color: #aaa;
+    }
+</style>
+    <div class="tables-container">
+        {% for table in tables %}
+        <div class="table-card">
+            <img src="{% if table.image %}{{ table.image.url }}{% else %}/static/images/default_table.jpg{% endif %}" alt="Стол {{ table.number }}">
+            <h3>Стол №{{ table.number }}</h3>
+            <p>Количество мест: {{ table.seats }}</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'reservation' table.number %}" class="reserve-button">Забронировать</a>
+        {% endif %}
+        </div>
+        {% empty %}
+        <p>Нет доступных столов.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
